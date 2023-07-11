@@ -1,7 +1,12 @@
-from microbilt_api.client import MicrobiltClient, PRODUCTION_URL, NotAuthorized
+from microbilt_api.client import MicrobiltClient, PRODUCTION_URL, SANDBOX_URL, NotAuthorized
 from unittest import TestCase 
 import pytest
 from requests import HTTPError
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_URL = SANDBOX_URL
 
 def test_pythonize():
     dict = MicrobiltClient.pythonize({
@@ -25,9 +30,10 @@ def test_pythonize():
     TestCase().assertDictEqual(dict, valid_dict)
 
 def test_auth_err():
-    client = MicrobiltClient(None, PRODUCTION_URL)
     with pytest.raises(NotAuthorized) as ex:
-        client.ABAAcctVerification(None, None)
+        client = MicrobiltClient("invalid", "invalid2", API_URL)
 
 def test_ABA_fail():
-    pass
+    client = MicrobiltClient(None, None, API_URL)
+    res = client.ABAAcctVerification('11103093', '19945192099')
+    assert res['decision_info']['decision'][0]['decision_code'] == 'D'
