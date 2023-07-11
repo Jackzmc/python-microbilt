@@ -11,6 +11,8 @@ class NotAuthorized(requests.HTTPError):
     """The apikey provided is not authorized or valid"""
 
 class MicrobiltClient:
+    """Creates a new MicrobiltCLient"""
+
     def pythonize(in_dict):
         return decamelize(in_dict)
         new_dict = dict()
@@ -25,6 +27,15 @@ class MicrobiltClient:
         return new_dict
 
     def __init__(self, client_id, client_secret, url = PRODUCTION_URL) -> None:
+        """Creates a new API client
+
+        :client_id
+            the api client id, defaults to env variable MICROBILT_CLIENT_ID
+        :client_secret
+            the api client secret, defaults to env variable MICROBILT_CLIENT_SECRET
+        :url
+            the URL to make requests to, defaults to PRODUCTION_URL. Can be SANDBOX_URL
+        """
         self._client_id = client_id or environ.get("MICROBILT_CLIENT_ID")
         self._client_secret = client_secret or environ.get("MICROBILT_CLIENT_SECRET")
         if self._client_id == None or self._client_secret == None:
@@ -64,7 +75,12 @@ class MicrobiltClient:
         return res
 
     
+
     def ABAAcctVerification(self, routing_number, account_number):
+        """Performs a ABA account verification
+
+        See https://developer.microbilt.com/api/ABAAcctVerification#/default/%2F for schemas (will be converted to snake case)
+        """
         payload = {
             "BankRoutingNumber": routing_number,
             "BankAccountNumber": account_number
