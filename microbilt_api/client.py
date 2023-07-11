@@ -4,15 +4,15 @@ from humps import decamelize
 PRODUCTION_URL = 'https://api.microbilt.com/'
 SANDBOX_URL = 'https://apitest.microbilt.com/'
 
-class MicrobitClient():
-    def pythonize(dict):
-        for key, val in dict.items():
+class MicrobiltClient:
+    def pythonize(in_dict):
+        new_dict = dict()
+        for key, val in in_dict.items():
             if type(val) == dict:
-                dict[decamelize(key)] = MicrobitClient.pythonize(val)
+                new_dict[decamelize(key)] = MicrobiltClient.pythonize(val)
             else:
-                dict[decamelize(key)] = val
-            del dict[key]
-        return dict
+                new_dict[decamelize(key)] = val
+        return new_dict
 
     def __init__(self, apikey, url) -> None:
         self.apikey = apikey
@@ -26,7 +26,7 @@ class MicrobitClient():
         res = requests.post(self.url, json=payload)  
         res.raise_for_status()  
         json = res.json()
-        return MicrobitClient.pythonize(json)
+        return MicrobiltClient.pythonize(json)
         return {
             "ach_status": json.get("ACHStatus"),
             "change_date": json.get("ChangeDT"),

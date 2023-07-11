@@ -1,14 +1,15 @@
-from microbit_api import MicrobitClient
+from microbilt_api.client import MicrobiltClient
+from unittest import TestCase 
 
 def test_pythonize():
-    dict = {
+    dict = MicrobiltClient.pythonize({
         "CamelOne": True,
         "APIKey": "string",
         "nested": {
             "CamelTwo": False,
             "APIKeyTwo": 5
         }
-    }
+    })
 
     valid_dict = {
         "camel_one": True,
@@ -19,4 +20,4 @@ def test_pythonize():
         }
     }
 
-    assert MicrobitClient.pythonize(dict) == valid_dict
+    TestCase().assertDictEqual(dict, valid_dict)
