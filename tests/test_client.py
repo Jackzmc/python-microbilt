@@ -8,6 +8,10 @@ load_dotenv()
 
 API_URL = SANDBOX_URL
 
+@pytest.fixture
+def client():
+    return MicrobiltClient(None, None, API_URL)
+
 def test_pythonize():
     dict = MicrobiltClient.pythonize({
         "CamelOne": True,
@@ -31,9 +35,15 @@ def test_pythonize():
 
 def test_auth_err():
     with pytest.raises(NotAuthorized) as ex:
-        client = MicrobiltClient("invalid", "invalid2", API_URL)
+        MicrobiltClient("invalid", "invalid2", API_URL)
 
-def test_ABA_fail():
-    client = MicrobiltClient(None, None, API_URL)
+def test_ABA_fail(client):
     res = client.ABAAcctVerification('11103093', '19945192099')
     assert res['decision_info']['decision'][0]['decision_code'] == 'D'
+
+def test_ABA_succeed(client):
+    res = client.ABAAcctVerification('011103093', '9945192099')
+    assert res['decision_info']['decision'][0]['decision_code'] == 'A'
+
+    res = client.ABAAcctVerification('011103093', '19945192099')
+    assert res['decision_info']['decision'][0]['decision_code'] == 'A'
