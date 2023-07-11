@@ -4,6 +4,9 @@ from humps import decamelize
 PRODUCTION_URL = 'https://api.microbilt.com/'
 SANDBOX_URL = 'https://apitest.microbilt.com/'
 
+class NotAuthorized(requests.HTTPError):
+    """The apikey provided is not authorized or valid"""
+
 class MicrobiltClient:
     def pythonize(in_dict):
         new_dict = dict()
@@ -13,6 +16,9 @@ class MicrobiltClient:
             else:
                 new_dict[decamelize(key)] = val
         return new_dict
+    
+    def _get_url(self, append):
+        return self.url + "/" + append
 
     def __init__(self, apikey, url) -> None:
         self.apikey = apikey
@@ -23,16 +29,9 @@ class MicrobiltClient:
             "BankRoutingNumber": routing_number,
             "BankAccountNumber": account_number
         }
-        res = requests.post(self.url, json=payload)  
+        res = requests.post(self._get_url("ABAAcctVerification"), json=payload)  
+        if res.status_code == 401:
+            raise NotAuthorized()
         res.raise_for_status()  
         json = res.json()
         return MicrobiltClient.pythonize(json)
-        return {
-            "ach_status": json.get("ACHStatus"),
-            "change_date": json.get("ChangeDT"),
-            "aba_number_schema": json.get("ABANumStatus"),
-            "aba_number": json.get("ABANum"),
-            "number_of_branches": json.get("NumOfBranches"),
-            "branch_info": json.get("BranchInfo"),
-            "decision_info": json.get("DecisionInfo")
-        }

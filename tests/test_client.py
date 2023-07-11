@@ -1,5 +1,7 @@
-from microbilt_api.client import MicrobiltClient
+from microbilt_api.client import MicrobiltClient, PRODUCTION_URL, NotAuthorized
 from unittest import TestCase 
+import pytest
+from requests import HTTPError
 
 def test_pythonize():
     dict = MicrobiltClient.pythonize({
@@ -21,3 +23,11 @@ def test_pythonize():
     }
 
     TestCase().assertDictEqual(dict, valid_dict)
+
+def test_auth_err():
+    client = MicrobiltClient(None, PRODUCTION_URL)
+    with pytest.raises(NotAuthorized) as ex:
+        client.ABAAcctVerification(None, None)
+
+def test_ABA_fail():
+    pass
