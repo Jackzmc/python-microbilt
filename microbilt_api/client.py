@@ -58,7 +58,10 @@ class MicrobiltClient:
         self._token = 'Bearer ' + json['access_token']
         print('got token')
 
-    def _post(self, path, data = None, json = None):
+    def _post_json(self, path, data = None, json = None):
+        """Posts JSON and receives JSON that is automatically passed through Microbilt.pythonize
+            Will also check for 401 unauthorized and send NotAuthorized
+        """
         headers = {
             'Authorization': self._token,
             'User-Agent': USER_AGENT
@@ -72,7 +75,9 @@ class MicrobiltClient:
             except requests.exceptions.JSONDecodeError:
                 pass
             raise NotAuthorized(res.text)
-        return res
+        else:
+            res.raise_for_status()
+        return MicrobiltClient.pythonize(res.json())
 
     
 
@@ -85,13 +90,7 @@ class MicrobiltClient:
             "BankRoutingNumber": routing_number,
             "BankAccountNumber": account_number
         }
-        # res = requests.post(self._get_url("ABAAcctVerification"), json=payload)  
-        res = self._post("ABAAcctVerification", json=payload)
-        if res.status_code == 401:
-            raise NotAuthorized(res)
-        res.raise_for_status()  
-        json = res.json()
-        return MicrobiltClient.pythonize(json)
+        return self._post_json("ABAAcctVerification", json=payload)
     
     def AddressStandardization(self, address1: str, city: str, state: str, zip_code: str, address2: str = None, street_pre_dir: str = None, street_name: str = None, street_num: str = None, street_type: str = None, street_suffix: str = None, street_post_dir: str = None, country: str = None, county: str = None, apt: str = None):
         """Performs address validation and standardization
@@ -117,9 +116,6 @@ class MicrobiltClient:
                 'County': county
             }
         }
-        res = self._post("AddressStandardization", json=payload)
-        if res.status_code == 401:
-            raise NotAuthorized(res)
-        res.raise_for_status()  
-        json = res.json()
-        return MicrobiltClient.pythonize(json)
+        return self._post_json("AddressStandardization", json=payload)
+    
+    
