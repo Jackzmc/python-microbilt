@@ -93,7 +93,7 @@ class MicrobiltClient:
         json = res.json()
         return MicrobiltClient.pythonize(json)
     
-    def AddressStandardization(self, address1, city, state, zip_code):
+    def AddressStandardization(self, address1: str, city: str, state: str, zip_code: str, address2: str = None, street_pre_dir: str = None, street_name: str = None, street_num: str = None, street_type: str = None, street_suffix: str = None, street_post_dir: str = None, country: str = None, county: str = None, apt: str = None):
         """Performs address validation and standardization
 
         Example schema response: https://jsoneditoronline.org/#right=cloud.f4c062af787840bdaa44d144d48a2580&left=local.qaluxi
@@ -102,9 +102,19 @@ class MicrobiltClient:
         payload = {
             'Address': {
                 'Addr1': address1,
+                'Addr2': address2,
+                'StreetPreDir': street_pre_dir,
+                'StreetName': street_name,
+                'StreetNum': street_num,
+                'StreetType': street_type,
+                'StreetSuffix': street_suffix,
+                'StreetPostDir': street_post_dir,
+                'Apt': apt,
                 'City': city,
                 'State': state,
-                'Zip': zip_code
+                'Zip': zip_code,
+                'Country': country,
+                'County': county
             }
         }
         res = self._post("AddressStandardization", json=payload)
