@@ -92,3 +92,24 @@ class MicrobiltClient:
         res.raise_for_status()  
         json = res.json()
         return MicrobiltClient.pythonize(json)
+    
+    def AddressStandardization(self, address1, city, state, zip_code):
+        """Performs address validation and standardization
+
+        Example schema response: https://jsoneditoronline.org/#right=cloud.f4c062af787840bdaa44d144d48a2580&left=local.qaluxi
+        See https://developer.microbilt.com/api/AddressStandardization#/default/%2F for schemas (will be converted to snake case)
+        """
+        payload = {
+            'Address': {
+                'Addr1': address1,
+                'City': city,
+                'State': state,
+                'Zip': zip_code
+            }
+        }
+        res = self._post("AddressStandardization", json=payload)
+        if res.status_code == 401:
+            raise NotAuthorized(res)
+        res.raise_for_status()  
+        json = res.json()
+        return MicrobiltClient.pythonize(json)
